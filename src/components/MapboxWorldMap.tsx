@@ -206,23 +206,46 @@ const MapboxWorldMap = () => {
 
   const getCurrentLocation = () => {
     return new Promise<[number, number]>((resolve, reject) => {
+      console.log('Checking geolocation support...');
+      
       if (!navigator.geolocation) {
+        console.error('Geolocation not supported');
         reject(new Error('Geolocation is not supported by this browser.'));
         return;
       }
 
+      console.log('Requesting location permission...');
       navigator.geolocation.getCurrentPosition(
         (position) => {
+          console.log('Location obtained:', position.coords);
           const coords: [number, number] = [position.coords.longitude, position.coords.latitude];
           setUserLocation(coords);
           resolve(coords);
         },
         (error) => {
-          reject(error);
+          console.error('Geolocation error:', error);
+          let errorMessage = 'Failed to get your location. ';
+          
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage += 'Please allow location access in your browser settings.';
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage += 'Location information is unavailable.';
+              break;
+            case error.TIMEOUT:
+              errorMessage += 'Location request timed out.';
+              break;
+            default:
+              errorMessage += 'An unknown error occurred.';
+              break;
+          }
+          
+          reject(new Error(errorMessage));
         },
         {
           enableHighAccuracy: true,
-          timeout: 10000,
+          timeout: 15000,
           maximumAge: 60000
         }
       );
@@ -230,12 +253,18 @@ const MapboxWorldMap = () => {
   };
 
   const showRoute = async (destination: [number, number]) => {
-    if (!map.current || !mapboxToken) return;
+    if (!map.current || !mapboxToken) {
+      console.log('Map or token not available:', { map: !!map.current, token: !!mapboxToken });
+      return;
+    }
 
+    console.log('Starting route calculation to:', destination);
     setIsLoadingRoute(true);
     
     try {
+      console.log('Getting user location...');
       const userCoords = await getCurrentLocation();
+      console.log('User location obtained:', userCoords);
       
       // Add user location marker
       const userMarker = document.createElement('div');
@@ -245,15 +274,24 @@ const MapboxWorldMap = () => {
         .setLngLat(userCoords)
         .addTo(map.current);
 
+      console.log('Fetching route from Mapbox Directions API...');
       // Get route from Mapbox Directions API
-      const response = await fetch(
-        `https://api.mapbox.com/directions/v5/mapbox/driving/${userCoords[0]},${userCoords[1]};${destination[0]},${destination[1]}?geometries=geojson&access_token=${mapboxToken}`
-      );
+      const directionsUrl = `https://api.mapbox.com/directions/v5/mapbox/driving/${userCoords[0]},${userCoords[1]};${destination[0]},${destination[1]}?geometries=geojson&access_token=${mapboxToken}`;
+      console.log('Directions API URL:', directionsUrl);
+      
+      const response = await fetch(directionsUrl);
+      console.log('Directions API response status:', response.status);
+      
+      if (!response.ok) {
+        throw new Error(`Directions API failed with status: ${response.status}`);
+      }
       
       const data = await response.json();
+      console.log('Directions API data:', data);
       
       if (data.routes && data.routes.length > 0) {
         const route = data.routes[0];
+        console.log('Route found, adding to map...');
         
         // Add route to map
         if (map.current.getSource('route')) {
@@ -293,10 +331,15 @@ const MapboxWorldMap = () => {
           padding: 50,
           duration: 2000
         });
+        
+        console.log('Route successfully added to map');
+        alert(`Route found! Distance: ${(route.distance / 1000).toFixed(1)} km, Duration: ${Math.round(route.duration / 60)} minutes`);
+      } else {
+        throw new Error('No routes found');
       }
     } catch (error) {
       console.error('Failed to get directions:', error);
-      alert('Failed to get directions. Please check your location permissions.');
+      alert(`Failed to get directions: ${error.message}. Please check your location permissions and internet connection.`);
     } finally {
       setIsLoadingRoute(false);
     }
