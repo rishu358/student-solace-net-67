@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { MessageCircle, Users, MapPin, Heart, HandHeart, Building, Home } from "lucide-react";
@@ -12,6 +13,7 @@ import WorldMapModal from "@/components/WorldMapModal";
 import OrganizationsModal from "@/components/OrganizationsModal";
 
 const Navigation = () => {
+  const navigate = useNavigate();
   const [chatOpen, setChatOpen] = useState(false);
   const [volunteerOpen, setVolunteerOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
@@ -27,7 +29,7 @@ const Navigation = () => {
   const navItems = [
     { name: "Home", href: null, icon: Home, action: scrollToTop },
     { name: "Free Chat", href: null, icon: MessageCircle, action: () => setChatOpen(true) },
-    { name: "Community", href: null, icon: Users, action: () => setCommunityOpen(true) },
+    { name: "Community", href: null, icon: Users, action: () => navigate("/community") },
     { name: "Local", href: null, icon: MapPin, action: () => setWorldMapOpen(true), hasTooltip: true },
     { name: "Considering Therapy", href: null, icon: Heart, action: () => setTherapyOpen(true) },
     { name: "Volunteer", href: null, icon: HandHeart, action: () => setVolunteerOpen(true) },
@@ -92,10 +94,10 @@ const Navigation = () => {
 
           {/* Login Button */}
           <div className="flex items-center space-x-3">
-            <Button variant="outline" size="sm" onClick={() => setLoginOpen(true)}>
+            <Button variant="outline" size="sm" onClick={() => navigate("/login")}>
               Login
             </Button>
-            <Button variant="hero" size="sm" onClick={() => setLoginOpen(true)}>
+            <Button variant="hero" size="sm" onClick={() => navigate("/login")}>
               Get Support Now
             </Button>
           </div>
