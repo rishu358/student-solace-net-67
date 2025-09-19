@@ -74,11 +74,29 @@ const WorldMapModal = ({ open, onOpenChange }: WorldMapModalProps) => {
     { 
       city: "Mumbai", 
       country: "India", 
-      available: false,
-      address: "Coming Soon",
-      phone: "Coming Soon",
+      available: true,
+      address: "Bandra Kurla Complex, Mumbai 400051",
+      phone: "+91 22 1234 5678",
       email: "mumbai@mindspace.com",
-      hours: "Coming Soon"
+      hours: "24/7 Crisis Support"
+    },
+    { 
+      city: "Delhi", 
+      country: "India", 
+      available: true,
+      address: "Connaught Place, New Delhi 110001",
+      phone: "+91 11 2345 6789",
+      email: "delhi@mindspace.com",
+      hours: "24/7 Crisis Support"
+    },
+    { 
+      city: "Bangalore", 
+      country: "India", 
+      available: true,
+      address: "MG Road, Bangalore 560001",
+      phone: "+91 80 3456 7890",
+      email: "bangalore@mindspace.com",
+      hours: "24/7 Crisis Support"
     },
     { 
       city: "São Paulo", 

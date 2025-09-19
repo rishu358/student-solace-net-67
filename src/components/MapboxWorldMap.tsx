@@ -25,6 +25,8 @@ const MapboxWorldMap = () => {
   const [mapInitialized, setMapInitialized] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCenter, setSelectedCenter] = useState<Center | null>(null);
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+  const [isLoadingRoute, setIsLoadingRoute] = useState(false);
 
   const centers: Center[] = [
     { 
@@ -90,12 +92,32 @@ const MapboxWorldMap = () => {
     { 
       city: "Mumbai", 
       country: "India", 
-      available: false,
-      address: "Coming Soon",
-      phone: "Coming Soon",
+      available: true,
+      address: "Bandra Kurla Complex, Mumbai 400051",
+      phone: "+91 22 1234 5678",
       email: "mumbai@mindspace.com",
-      hours: "Coming Soon",
+      hours: "24/7 Crisis Support",
       coordinates: [72.8777, 19.0760]
+    },
+    { 
+      city: "Delhi", 
+      country: "India", 
+      available: true,
+      address: "Connaught Place, New Delhi 110001",
+      phone: "+91 11 2345 6789",
+      email: "delhi@mindspace.com",
+      hours: "24/7 Crisis Support",
+      coordinates: [77.2090, 28.6139]
+    },
+    { 
+      city: "Bangalore", 
+      country: "India", 
+      available: true,
+      address: "MG Road, Bangalore 560001",
+      phone: "+91 80 3456 7890",
+      email: "bangalore@mindspace.com",
+      hours: "24/7 Crisis Support",
+      coordinates: [77.5946, 12.9716]
     },
     { 
       city: "São Paulo", 
@@ -179,6 +201,104 @@ const MapboxWorldMap = () => {
       }
     } catch (error) {
       console.error('Search failed:', error);
+    }
+  };
+
+  const getCurrentLocation = () => {
+    return new Promise<[number, number]>((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error('Geolocation is not supported by this browser.'));
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const coords: [number, number] = [position.coords.longitude, position.coords.latitude];
+          setUserLocation(coords);
+          resolve(coords);
+        },
+        (error) => {
+          reject(error);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 60000
+        }
+      );
+    });
+  };
+
+  const showRoute = async (destination: [number, number]) => {
+    if (!map.current || !mapboxToken) return;
+
+    setIsLoadingRoute(true);
+    
+    try {
+      const userCoords = await getCurrentLocation();
+      
+      // Add user location marker
+      const userMarker = document.createElement('div');
+      userMarker.className = 'w-4 h-4 rounded-full bg-green-500 border-2 border-white shadow-lg animate-pulse';
+      
+      new mapboxgl.Marker(userMarker)
+        .setLngLat(userCoords)
+        .addTo(map.current);
+
+      // Get route from Mapbox Directions API
+      const response = await fetch(
+        `https://api.mapbox.com/directions/v5/mapbox/driving/${userCoords[0]},${userCoords[1]};${destination[0]},${destination[1]}?geometries=geojson&access_token=${mapboxToken}`
+      );
+      
+      const data = await response.json();
+      
+      if (data.routes && data.routes.length > 0) {
+        const route = data.routes[0];
+        
+        // Add route to map
+        if (map.current.getSource('route')) {
+          map.current.removeLayer('route');
+          map.current.removeSource('route');
+        }
+        
+        map.current.addSource('route', {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            properties: {},
+            geometry: route.geometry
+          }
+        });
+        
+        map.current.addLayer({
+          id: 'route',
+          type: 'line',
+          source: 'route',
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round'
+          },
+          paint: {
+            'line-color': '#3b82f6',
+            'line-width': 5
+          }
+        });
+        
+        // Fit map to show entire route
+        const bounds = new mapboxgl.LngLatBounds();
+        bounds.extend(userCoords);
+        bounds.extend(destination);
+        
+        map.current.fitBounds(bounds, {
+          padding: 50,
+          duration: 2000
+        });
+      }
+    } catch (error) {
+      console.error('Failed to get directions:', error);
+      alert('Failed to get directions. Please check your location permissions.');
+    } finally {
+      setIsLoadingRoute(false);
     }
   };
 
@@ -275,8 +395,14 @@ const MapboxWorldMap = () => {
                   <p className="text-primary font-medium">{selectedCenter.hours}</p>
                   
                   <div className="flex gap-2 mt-3">
-                    <Button variant="outline" size="sm" className="flex-1">
-                      Get Directions
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex-1"
+                      onClick={() => showRoute(selectedCenter.coordinates)}
+                      disabled={isLoadingRoute}
+                    >
+                      {isLoadingRoute ? 'Loading Route...' : 'Get Directions'}
                     </Button>
                     <Button variant="default" size="sm" className="flex-1">
                       Contact Now
