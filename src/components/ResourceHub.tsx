@@ -1,9 +1,19 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BookOpen, Video, Headphones, Download, Clock, Star } from "lucide-react";
+import { useState } from "react";
 import yogaMeditation from "@/assets/yoga-meditation.jpg";
+import ExamAnxietyModal from "@/components/ExamAnxietyModal";
+import MindfulnessVideoModal from "@/components/MindfulnessVideoModal";
+import SleepMeditationModal from "@/components/SleepMeditationModal";
+import EmergencyCopingModal from "@/components/EmergencyCopingModal";
 
 const ResourceHub = () => {
+  const [examAnxietyOpen, setExamAnxietyOpen] = useState(false);
+  const [mindfulnessOpen, setMindfulnessOpen] = useState(false);
+  const [sleepMeditationOpen, setSleepMeditationOpen] = useState(false);
+  const [emergencyCopingOpen, setEmergencyCopingOpen] = useState(false);
+
   const resources = [
     {
       type: "Guide",
@@ -12,7 +22,8 @@ const ResourceHub = () => {
       duration: "10 min read",
       rating: 4.8,
       icon: BookOpen,
-      color: "bg-blue-100 text-blue-600"
+      color: "bg-blue-100 text-blue-600",
+      onClick: () => setExamAnxietyOpen(true)
     },
     {
       type: "Video",
@@ -21,7 +32,8 @@ const ResourceHub = () => {
       duration: "15 min watch",
       rating: 4.9,
       icon: Video,
-      color: "bg-purple-100 text-purple-600"
+      color: "bg-purple-100 text-purple-600",
+      onClick: () => setMindfulnessOpen(true)
     },
     {
       type: "Audio",
@@ -30,7 +42,8 @@ const ResourceHub = () => {
       duration: "20 min listen",
       rating: 4.7,
       icon: Headphones,
-      color: "bg-green-100 text-green-600"
+      color: "bg-green-100 text-green-600",
+      onClick: () => setSleepMeditationOpen(true)
     },
     {
       type: "Toolkit",
@@ -39,7 +52,8 @@ const ResourceHub = () => {
       duration: "Instant access",
       rating: 4.9,
       icon: Download,
-      color: "bg-red-100 text-red-600"
+      color: "bg-red-100 text-red-600",
+      onClick: () => setEmergencyCopingOpen(true)
     }
   ];
 
@@ -91,7 +105,7 @@ const ResourceHub = () => {
                     </div>
                   </div>
                   
-                  <Button variant="soft" size="sm" className="w-full">
+                  <Button variant="soft" size="sm" className="w-full" onClick={resource.onClick}>
                     Access Resource
                   </Button>
                 </CardContent>
@@ -125,6 +139,12 @@ const ResourceHub = () => {
           </Button>
         </div>
       </div>
+
+      {/* Resource Modals */}
+      <ExamAnxietyModal open={examAnxietyOpen} onOpenChange={setExamAnxietyOpen} />
+      <MindfulnessVideoModal open={mindfulnessOpen} onOpenChange={setMindfulnessOpen} />
+      <SleepMeditationModal open={sleepMeditationOpen} onOpenChange={setSleepMeditationOpen} />
+      <EmergencyCopingModal open={emergencyCopingOpen} onOpenChange={setEmergencyCopingOpen} />
     </section>
   );
 };
