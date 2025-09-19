@@ -1,0 +1,127 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Mental Health Support System - Calming Design System */
+
+@layer base {
+  :root {
+    /* Base colors - warm and soothing */
+    --background: 45 25% 96%;
+    --foreground: 25 20% 25%;
+
+    /* Card and surfaces */
+    --card: 42 30% 98%;
+    --card-foreground: 25 20% 25%;
+
+    --popover: 42 30% 98%;
+    --popover-foreground: 25 20% 25%;
+
+    /* Primary - soothing sage green */
+    --primary: 125 25% 55%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 125 35% 70%;
+
+    /* Secondary - warm cream tone */
+    --secondary: 40 30% 88%;
+    --secondary-foreground: 25 20% 25%;
+
+    /* Muted backgrounds */
+    --muted: 45 20% 92%;
+    --muted-foreground: 25 15% 50%;
+
+    /* Accent - soft lavender for wellness */
+    --accent: 270 20% 88%;
+    --accent-foreground: 270 40% 35%;
+    --accent-strong: 270 30% 65%;
+
+    /* Supporting colors */
+    --success: 110 40% 45%;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 25 65% 60%;
+    --warning-foreground: 0 0% 100%;
+
+    --destructive: 5 60% 65%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Interface elements */
+    --border: 45 15% 88%;
+    --input: 45 20% 90%;
+    --ring: 125 25% 55%;
+
+    --radius: 0.75rem;
+
+    /* Gradients for hero sections */
+    --gradient-hero: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-glow)) 100%);
+    --gradient-subtle: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%);
+    --gradient-wellness: linear-gradient(135deg, hsl(var(--accent)) 0%, hsl(var(--accent-strong)) 100%);
+
+    /* Shadows */
+    --shadow-soft: 0 4px 20px -8px hsl(var(--primary) / 0.15);
+    --shadow-card: 0 2px 12px -4px hsl(var(--foreground) / 0.08);
+    --shadow-glow: 0 0 0 0 hsl(var(--primary-glow) / 0.3);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply scroll-m-20 tracking-tight;
+  }
+}
+
+@layer components {
+  .gradient-hero {
+    background: var(--gradient-hero);
+  }
+  
+  .gradient-wellness {
+    background: var(--gradient-wellness);
+  }
+  
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+  
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+  
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+  
+  .btn-glow:hover {
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-1px);
+  }
+}
